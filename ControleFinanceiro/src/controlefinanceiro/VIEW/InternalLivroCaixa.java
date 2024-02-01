@@ -12,6 +12,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -238,26 +239,26 @@ public class InternalLivroCaixa extends javax.swing.JInternalFrame {
         l = dao.ListaLivroCaixa().get(index);
 
         switch (JOptionPane.showConfirmDialog(null, "Deseja excluir a Informção ? \n "
-            + "\n Descrição:  " + l.getDescricao()
-            + "\n Entrada R$: " + l.getEntrada()
-            + "\n Data entrada R$: " + l.getDataEntrada()
-            + "\n Saida R$: " + l.getSaida()
-            + "\n Data Saida: " + l.getDataSaida()
-            + "\n Será alterado"
-            + " \n Descrição: " + txtDescricao.getText()
-            + "\n Entrada R$: " + txtEntrada.getText()
-            + "\n Data Entrada R$: " + txtDataEntrada.getText()
-            + "\n Saida R$: " + txtSaida.getText()
-            + "\n Data Saida R$: " + txtDataSaida.getText(),
-            "Confirmação ", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
-        case 0:
-        dao.remover(l);
-        carregaTabela();
-        //  limparTexto();
-        break;
-        case 1:
-        JOptionPane.showMessageDialog(null, "Nehuma exclusão foi feita.", "AVISO", JOptionPane.INFORMATION_MESSAGE);
-        break;
+                + "\n Descrição:  " + l.getDescricao()
+                + "\n Entrada R$: " + l.getEntrada()
+                + "\n Data entrada R$: " + l.getDataEntrada()
+                + "\n Saida R$: " + l.getSaida()
+                + "\n Data Saida: " + l.getDataSaida()
+                + "\n Será alterado"
+                + " \n Descrição: " + txtDescricao.getText()
+                + "\n Entrada R$: " + txtEntrada.getText()
+                + "\n Data Entrada R$: " + txtDataEntrada.getText()
+                + "\n Saida R$: " + txtSaida.getText()
+                + "\n Data Saida R$: " + txtDataSaida.getText(),
+                "Confirmação ", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
+            case 0:
+                dao.remover(l);
+                carregaTabela();
+                //  limparTexto();
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(null, "Nehuma exclusão foi feita.", "AVISO", JOptionPane.INFORMATION_MESSAGE);
+                break;
         }
     }//GEN-LAST:event_btExcluirActionPerformed
 
@@ -359,17 +360,28 @@ public class InternalLivroCaixa extends javax.swing.JInternalFrame {
         // limparTexto();
         carregaTabela();
     }//GEN-LAST:event_btEntradaActionPerformed
+    public class DateRenderer extends DefaultTableCellRenderer {
+
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        @Override
+        public void setValue(Object value) {
+            if (value instanceof Date) {
+                value = dateFormat.format((Date) value);
+            }
+            super.setValue(value);
+        }
+    }
 
     private void carregaTabela() {
-
         DefaultTableModel modelo = (DefaultTableModel) tbLivroCaixa.getModel();
-
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        DateRenderer dateRenderer = new DateRenderer();
 
-        tbLivroCaixa.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-        tbLivroCaixa.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
         tbLivroCaixa.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+        tbLivroCaixa.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
+
         try {
             Connection con = conexaoBancoDados.getConnection();
             PreparedStatement pstm;
@@ -380,52 +392,58 @@ public class InternalLivroCaixa extends javax.swing.JInternalFrame {
 
             double saldoAtual = 0;
             double saldoAnterior = 0;
-            pstm = con.prepareStatement("SELECT datahora, descricao, entrada,dataentrada, saida, datasaida FROM livrocaixa ORDER BY datahora ASC;");
+            pstm = con.prepareStatement("SELECT datahora, descricao, entrada, dataentrada, saida, datasaida FROM livrocaixa ORDER BY datahora ASC;");
             rs = pstm.executeQuery();
 
             NumberFormat currencyEntrada = NumberFormat.getCurrencyInstance();
             NumberFormat currencySaida = NumberFormat.getCurrencyInstance();
             modelo.setNumRows(0);
+
             while (rs.next()) {
                 Timestamp dataHora = rs.getTimestamp("datahora");
                 int mesDataHora = dataHora.toLocalDateTime().getMonthValue();
 
                 if (mesDataHora != mesAtual) {
                     modelo.setNumRows(0);
-
                     lblSaldoAtual.setText("R$: 0.00");
                     lblSaldoAnterior.setText("0");
-
                     saldoAtual = 0;
                     saldoAnterior = 0;
-                    // Atualiza o mês atual
-                    mesAtual = mesDataHora;
+                    mesAtual = mesDataHora; // Atualiza o mês atual
                 }
-                // Calcula o saldoAtual para a linha atual
+
                 double entrada = rs.getDouble("entrada");
                 double saida = rs.getDouble("saida");
-                //exibi o saldo anterior
-                saldoAnterior = saldoAtual;
-                saldoAtual += (entrada - saida);
 
+                // Verifica se as datas não são nulas antes de formatá-las
+                String dataEntradaFormatted = (rs.getDate("dataentrada") != null) ? dateRenderer.dateFormat.format(rs.getDate("dataentrada")) : "";
+                String dataSaidaFormatted = (rs.getDate("datasaida") != null) ? dateRenderer.dateFormat.format(rs.getDate("datasaida")) : "";
+
+                // Adiciona a linha à tabela
                 modelo.addRow(new Object[]{
-                    dataHora,
+                    dateRenderer.dateFormat.format(dataHora),
                     rs.getString("descricao"),
                     currencyEntrada.format(entrada),
-                    rs.getDate("dataentrada"),
+                    dataEntradaFormatted,
                     currencySaida.format(saida),
-                    rs.getDate("datasaida"),
+                    dataSaidaFormatted,
                     currencySaida.format(saldoAtual)
                 });
-                // Atualiza os rótulos dentro do loop
-                lblSaldoAtual.setText(currencySaida.format(saldoAtual));
-                lblSaldoAnterior.setText(currencyEntrada.format(saldoAnterior));
+
+                // Atualiza os saldos dentro do loop
+                saldoAnterior = saldoAtual;
+                saldoAtual += (entrada - saida);
+                
             }
+ 
+            lblSaldoAtual.setText(currencySaida.format(saldoAtual));
+            lblSaldoAnterior.setText(currencyEntrada.format(saldoAnterior)); // Removido do loop, pois só precisa ser atualizado uma vez
             conexaoBancoDados.closeConnection(con, pstm, rs);
         } catch (Exception ErroSql) {
             JOptionPane.showMessageDialog(null, "Erro ao carregar a tabela de dados: " + ErroSql, "ERRO", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAlterar;

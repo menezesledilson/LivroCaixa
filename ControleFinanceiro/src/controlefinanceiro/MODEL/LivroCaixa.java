@@ -1,9 +1,7 @@
 package controlefinanceiro.MODEL;
 
-
 import java.sql.Date;
 import java.sql.Timestamp;
-
 
 public class LivroCaixa {
 

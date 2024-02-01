@@ -97,8 +97,11 @@
         </Component>
         <Component class="javax.swing.JButton" name="btExcel">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Emitir Excel"/>
+            <Property name="text" type="java.lang.String" value="Exporta Excel"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btExcelActionPerformed"/>
+          </Events>
         </Component>
         <Container class="javax.swing.JScrollPane" name="jScrollPane1">
           <AuxValues>
