@@ -9,9 +9,9 @@ public class LivroCaixa {
     private Timestamp datahora;
     private String descricao;
     private Double entrada;
-    private Date dataEntrada;
+    private String dataEntrada;
     private Double saida;
-    private Date dataSaida;
+    private String dataSaida;
 
     public Long getId() {
         return id;
@@ -45,11 +45,11 @@ public class LivroCaixa {
         this.entrada = entrada;
     }
 
-    public Date getDataEntrada() {
+    public String getDataEntrada() {
         return dataEntrada;
     }
 
-    public void setDataEntrada(Date dataEntrada) {
+    public void setDataEntrada(String dataEntrada) {
         this.dataEntrada = dataEntrada;
     }
 
@@ -61,12 +61,13 @@ public class LivroCaixa {
         this.saida = saida;
     }
 
-    public Date getDataSaida() {
+    public String getDataSaida() {
         return dataSaida;
     }
 
-    public void setDataSaida(Date dataSaida) {
+    public void setDataSaida(String dataSaida) {
         this.dataSaida = dataSaida;
     }
-   
+
+    
 }

@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +34,7 @@ public class InternalBuscaDiarioFinanceiroMensal extends javax.swing.JInternalFr
 
     public InternalBuscaDiarioFinanceiroMensal() {
         initComponents();
+        desativarBotao();
     }
 
     @SuppressWarnings("unchecked")
@@ -54,6 +57,11 @@ public class InternalBuscaDiarioFinanceiroMensal extends javax.swing.JInternalFr
         setTitle("Diário Financeiro Mensal");
 
         btNovaPesquisa.setText("Nova Pesquisa");
+        btNovaPesquisa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btNovaPesquisaActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Data inicial");
 
@@ -102,9 +110,9 @@ public class InternalBuscaDiarioFinanceiroMensal extends javax.swing.JInternalFr
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jDataFinal, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                        .addGap(21, 21, 21)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btProcurarRegistro)
-                        .addGap(16, 16, 16)
+                        .addGap(27, 27, 27)
                         .addComponent(btImprimir)
                         .addGap(18, 18, 18)
                         .addComponent(btExcel))
@@ -126,7 +134,7 @@ public class InternalBuscaDiarioFinanceiroMensal extends javax.swing.JInternalFr
                     .addComponent(jDataFinal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jDataInicial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 356, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -138,11 +146,19 @@ public class InternalBuscaDiarioFinanceiroMensal extends javax.swing.JInternalFr
     public class DateRenderer extends DefaultTableCellRenderer {
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
         @Override
         public void setValue(Object value) {
             if (value instanceof Date) {
                 value = dateFormat.format((Date) value);
+            } else if (value instanceof Timestamp) {
+                Timestamp timestampValue = (Timestamp) value;
+                Date dateValue = new Date(timestampValue.getTime());
+                String formattedDateTime = dateTimeFormat.format(dateValue);
+
+                // Define o valor formatado na célula da tabela
+                value = formattedDateTime;
             }
             super.setValue(value);
         }
@@ -156,7 +172,7 @@ public class InternalBuscaDiarioFinanceiroMensal extends javax.swing.JInternalFr
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-     
+
         DateRenderer dateRenderer = new DateRenderer();
 
         DefaultTableModel model = (DefaultTableModel) tbFinanceiroMensal.getModel();
@@ -169,8 +185,15 @@ public class InternalBuscaDiarioFinanceiroMensal extends javax.swing.JInternalFr
         columnModel.getColumn(3).setPreferredWidth(10);
 
         // Aplicar o renderizador às colunas de valorpedido (índice 1) e quantidadebobina (índice 2)
-        tbFinanceiroMensal.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+        tbFinanceiroMensal.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         tbFinanceiroMensal.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+        tbFinanceiroMensal.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
+
+        LocalDateTime dataHora = LocalDateTime.now();
+
+        // Formate a data e a hora no padrão brasileiro
+        DateTimeFormatter formatoBrasileiro = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String dataHoraFormatada = dataHora.format(formatoBrasileiro);
 
         try (Connection con = conexaoBancoDados.getConnection()) {
             String sql = "SELECT * FROM livrocaixa WHERE (datahora BETWEEN ? AND ?) OR (datahora BETWEEN ? AND ?) ORDER BY datahora ASC";
@@ -200,17 +223,20 @@ public class InternalBuscaDiarioFinanceiroMensal extends javax.swing.JInternalFr
                         model.setRowCount(0);
                         do {
                             // Verifica se as datas não são nulas antes de formatá-las
-                            String dataEntradaFormatted = (rs.getDate("dataentrada") != null) ? dateRenderer.dateFormat.format(rs.getDate("dataentrada")) : "";
-                            String dataSaidaFormatted = (rs.getDate("datasaida") != null) ? dateRenderer.dateFormat.format(rs.getDate("datasaida")) : "";
+                            //String dataEntradaFormatted = (rs.getDate("dataentrada") != null) ? dateRenderer.dateFormat.format(rs.getDate("dataentrada")) : "";
+                           // String dataSaidaFormatted = (rs.getDate("datasaida") != null) ? dateRenderer.dateFormat.format(rs.getDate("datasaida")) : "";
 
                             model.addRow(new Object[]{
-                                rs.getObject("datahora"),
+                                dataHoraFormatada,
                                 rs.getObject("descricao"),
                                 //  rs.getObject("entrada"),
                                 currencyValorEntrada.format(rs.getDouble("entrada")),
-                                dataEntradaFormatted,
+                                //dataEntradaFormatted,
+                                 rs.getObject("dataentrada"),
                                 currencyValorSaida.format(rs.getDouble("saida")),
-                                dataSaidaFormatted,});
+                                rs.getObject("datasaida"),
+                               // dataSaidaFormatted,});
+                            });
                         } while (rs.next());
                     }
                 }
@@ -221,10 +247,16 @@ public class InternalBuscaDiarioFinanceiroMensal extends javax.swing.JInternalFr
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+        btImprimir.setEnabled(true);
+        btExcel.setEnabled(true);
+        jDataInicial.setEnabled(false);
+        jDataFinal.setEnabled(false);
+       btProcurarRegistro.setEnabled(false);
+        
     }//GEN-LAST:event_btProcurarRegistroActionPerformed
 
     private void btExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btExcelActionPerformed
-          FileOutputStream excelFOU = null;
+        FileOutputStream excelFOU = null;
         BufferedOutputStream excelBOU = null;
         XSSFWorkbook excelJTableExporter = null;
 
@@ -312,6 +344,25 @@ public class InternalBuscaDiarioFinanceiroMensal extends javax.swing.JInternalFr
         }
     }//GEN-LAST:event_btExcelActionPerformed
 
+    private void btNovaPesquisaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btNovaPesquisaActionPerformed
+        ativarBotao();
+        
+        btImprimir.setEnabled(false);
+        btExcel.setEnabled(false);
+    }//GEN-LAST:event_btNovaPesquisaActionPerformed
+    public void desativarBotao() {
+        jDataInicial.setEnabled(false);
+        jDataFinal.setEnabled(false);
+        btExcel.setEnabled(false);
+        btImprimir.setEnabled(false);
+        btProcurarRegistro.setEnabled(false);
+    }
+
+    public void ativarBotao() {
+        jDataInicial.setEnabled(true);
+        jDataFinal.setEnabled(true);
+        btProcurarRegistro.setEnabled(true);
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btExcel;
     private javax.swing.JButton btImprimir;

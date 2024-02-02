@@ -235,12 +235,20 @@ public class InternalDiarioFinanceiroAnual extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btExcelActionPerformed
     public class DateRenderer extends DefaultTableCellRenderer {
 
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+       // final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
         @Override
         public void setValue(Object value) {
             if (value instanceof Date) {
-                value = dateFormat.format((Date) value);
+            //    value = dateFormat.format((Date) value);
+            } else if (value instanceof Timestamp) {
+                Timestamp timestampValue = (Timestamp) value;
+                Date dateValue = new Date(timestampValue.getTime());
+                String formattedDateTime = dateTimeFormat.format(dateValue);
+
+                // Define o valor formatado na célula da tabela
+                value = formattedDateTime;
             }
             super.setValue(value);
         }
@@ -252,6 +260,7 @@ public class InternalDiarioFinanceiroAnual extends javax.swing.JInternalFrame {
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         DateRenderer dateRenderer = new DateRenderer();
 
+        tbDiarioAnual.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         tbDiarioAnual.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
         tbDiarioAnual.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
 
@@ -260,12 +269,12 @@ public class InternalDiarioFinanceiroAnual extends javax.swing.JInternalFrame {
             PreparedStatement pstm;
             ResultSet rs;
 
-        //    Calendar cal = Calendar.getInstance();
-          //  int mesAtual = cal.get(Calendar.MONTH) + 1;
+            //  Calendar cal = Calendar.getInstance();
+            //  int mesAtual = cal.get(Calendar.MONTH) + 1;
+            double somaEntrada = 0;
+            double somaSaida = 0;
 
-            double saldoAtual = 0;
-            double saldoAnterior = 0;
-            pstm = con.prepareStatement("SELECT datahora, descricao, entrada, dataentrada, saida, datasaida FROM livrocaixa ORDER BY datahora ASC;");
+            pstm = con.prepareStatement("SELECT datahora, descricao, entrada, dataentrada, saida, datasaida FROM livrocaixa ORDER BY datahora DESC;");
             rs = pstm.executeQuery();
 
             NumberFormat currencyEntrada = NumberFormat.getCurrencyInstance();
@@ -275,40 +284,43 @@ public class InternalDiarioFinanceiroAnual extends javax.swing.JInternalFrame {
             while (rs.next()) {
                 Timestamp dataHora = rs.getTimestamp("datahora");
                 int mesDataHora = dataHora.toLocalDateTime().getMonthValue();
-/*
-                if (mesDataHora != mesAtual) {
+
+                /*    if (mesDataHora != mesAtual) {
                     modelo.setNumRows(0);
                     lblSaldoAtual.setText("R$: 0.00");
                     lblSaldoAnterior.setText("0");
                     saldoAtual = 0;
                     saldoAnterior = 0;
                     mesAtual = mesDataHora; // Atualiza o mês atual
-                }*/
-
+                }
+                 */
                 double entrada = rs.getDouble("entrada");
                 double saida = rs.getDouble("saida");
 
                 // Verifica se as datas não são nulas antes de formatá-las
-                String dataEntradaFormatted = (rs.getDate("dataentrada") != null) ? dateRenderer.dateFormat.format(rs.getDate("dataentrada")) : "";
-                String dataSaidaFormatted = (rs.getDate("datasaida") != null) ? dateRenderer.dateFormat.format(rs.getDate("datasaida")) : "";
+            //    String dataEntradaFormatted = (rs.getDate("dataentrada") != null) ? dateRenderer.dateFormat.format(rs.getDate("dataentrada")) : "";
+            //    String dataSaidaFormatted = (rs.getDate("datasaida") != null) ? dateRenderer.dateFormat.format(rs.getDate("datasaida")) : "";
 
                 // Adiciona a linha à tabela
                 modelo.addRow(new Object[]{
-                    dateRenderer.dateFormat.format(dataHora),
+                    dateRenderer.dateTimeFormat.format(dataHora),
                     rs.getString("descricao"),
                     currencyEntrada.format(entrada),
-                    dataEntradaFormatted,
+                      rs.getString("dataentrada"),
+                   // dataEntradaFormatted,
                     currencySaida.format(saida),
-                    dataSaidaFormatted,
-                    currencySaida.format(saldoAtual)
+                      rs.getString("datasaida"),
+                   // dataSaidaFormatted,
+                   // currencySaida.format(saldoAtual)
                 });
                 // Atualiza os saldos dentro do loop
-                saldoAnterior = saldoAtual;
-                saldoAtual += (entrada - saida);
+                
+                somaEntrada += entrada;
+                somaSaida += saida;
             }
             // Atualiza os rótulos dentro do loop
-            lblSaldoAtual.setText(currencySaida.format(saldoAtual));
-            lblSaldoAnterior.setText(currencyEntrada.format(saldoAnterior));
+            lblSaldoAtual.setText(currencySaida.format(somaEntrada));
+            lblSaldoAnterior.setText(currencyEntrada.format(somaSaida));
             conexaoBancoDados.closeConnection(con, pstm, rs);
         } catch (Exception ErroSql) {
             JOptionPane.showMessageDialog(null, "Erro ao carregar a tabela de dados: " + ErroSql, "ERRO", JOptionPane.ERROR_MESSAGE);

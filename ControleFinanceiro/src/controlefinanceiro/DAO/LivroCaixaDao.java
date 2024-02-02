@@ -20,7 +20,7 @@ public class LivroCaixaDao {
             pstm = con.prepareStatement("INSERT INTO livrocaixa(descricao,entrada,dataentrada) values (?,?,?);");
             pstm.setString(1, livroCaixa.getDescricao());
             pstm.setDouble(2, livroCaixa.getEntrada());
-            pstm.setDate(3, livroCaixa.getDataEntrada());
+            pstm.setString(3, livroCaixa.getDataEntrada());
 
             pstm.execute();
             JOptionPane.showMessageDialog(null, "Adicionado com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
@@ -38,7 +38,7 @@ public class LivroCaixaDao {
             pstm = con.prepareStatement("INSERT INTO livrocaixa(descricao,saida,datasaida) values (?,?,?);");
             pstm.setString(1, livroCaixa.getDescricao());
             pstm.setDouble(2, livroCaixa.getSaida());
-            pstm.setDate(3, livroCaixa.getDataSaida());
+            pstm.setString(3, livroCaixa.getDataSaida());
             pstm.execute();
             JOptionPane.showMessageDialog(null, "Adicionado com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException ErroSql) {
@@ -48,18 +48,18 @@ public class LivroCaixaDao {
         }
     }
 
-    public void alterar(LivroCaixa livroCaixa) {
+    public void alterarLivroCaixa(LivroCaixa livroCaixa) {
         Connection con = conexaoBancoDados.getConnection();
         PreparedStatement pstm = null;
         try {
-            pstm = con.prepareStatement("UPDATE livrocaixa set datahora = ? , descricao = ?, entrada = ?,Dataentrada = ?, saida = ?, datasaida = ? where id = ?;");
+            pstm = con.prepareStatement("UPDATE livrocaixa SET descricao = ?, entrada = ?, dataentrada = ?, saida = ?, datasaida = ? WHERE id = ?;");
+            pstm.setString(1, livroCaixa.getDescricao());
+            pstm.setDouble(2, livroCaixa.getEntrada());
+            pstm.setString(3, livroCaixa.getDataEntrada());
+            pstm.setDouble(4, livroCaixa.getSaida());
+            pstm.setString(5, livroCaixa.getDataSaida());
+            pstm.setLong(6, livroCaixa.getId());
 
-            pstm.setTimestamp(1, livroCaixa.getDatahora());
-            pstm.setString(2, livroCaixa.getDescricao());
-            pstm.setDouble(3, livroCaixa.getEntrada());
-            pstm.setDate(4, livroCaixa.getDataEntrada());
-            pstm.setDouble(5, livroCaixa.getSaida());
-            pstm.setDate(6, livroCaixa.getDataSaida());
             pstm.executeUpdate();
 
             JOptionPane.showMessageDialog(null, "Atualizado com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
@@ -107,9 +107,9 @@ public class LivroCaixaDao {
                 controleLivroCaixa.setDatahora(rs.getTimestamp("datahora"));
                 controleLivroCaixa.setDescricao(rs.getString("descricao"));
                 controleLivroCaixa.setEntrada(rs.getDouble("entrada"));
-                controleLivroCaixa.setDataEntrada(rs.getDate("dataentrada"));
+                controleLivroCaixa.setDataEntrada(rs.getString("dataentrada"));
                 controleLivroCaixa.setSaida(rs.getDouble("saida"));
-                controleLivroCaixa.setDataSaida(rs.getDate("datasaida"));
+                controleLivroCaixa.setDataSaida(rs.getString("datasaida"));
 
                 controleLivrosCaixa.add(controleLivroCaixa);
             }

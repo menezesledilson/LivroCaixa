@@ -1,5 +1,6 @@
 package controlefinanceiro.VIEW;
 
+import com.sun.javafx.css.SizeUnits;
 import controlefinanceiro.CONEXAO.conexaoBancoDados;
 import controlefinanceiro.DAO.LivroCaixaDao;
 import controlefinanceiro.MODEL.LivroCaixa;
@@ -25,6 +26,8 @@ public class InternalLivroCaixa extends javax.swing.JInternalFrame {
     public InternalLivroCaixa() {
         initComponents();
         carregaTabela();
+        desativarBotao();
+        desativarCampo();
     }
     private final SimpleDateFormat sdfC = new SimpleDateFormat("dd-MM-yyyy");
     private final SimpleDateFormat sdfE = new SimpleDateFormat("dd-MM-yyyy");
@@ -68,6 +71,11 @@ public class InternalLivroCaixa extends javax.swing.JInternalFrame {
                 "Data hora", "Descrição", "Entrada", "Data Entrada", "Saida", "Data Saida"
             }
         ));
+        tbLivroCaixa.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbLivroCaixaMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tbLivroCaixa);
 
         btEntrada.setText("Entrada");
@@ -129,6 +137,11 @@ public class InternalLivroCaixa extends javax.swing.JInternalFrame {
         jLabel7.setText("Saldo atual.:");
 
         btNovo.setText("Novo");
+        btNovo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btNovoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -260,77 +273,85 @@ public class InternalLivroCaixa extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(null, "Nehuma exclusão foi feita.", "AVISO", JOptionPane.INFORMATION_MESSAGE);
                 break;
         }
+        btExcluir.setEnabled(false);
     }//GEN-LAST:event_btExcluirActionPerformed
 
     private void btAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAlterarActionPerformed
-        /*    LivroCaixa l = new LivroCaixa();
+        LivroCaixa l = new LivroCaixa();
         LivroCaixaDao dao = new LivroCaixaDao();
 
         int index = tbLivroCaixa.getSelectedRow();
         l = dao.ListaLivroCaixa().get(index);
 
         switch (JOptionPane.showConfirmDialog(null,
-            "[--ALTERAÇÃO DE DADOS--] \n Dado Atual"
-            + "\n Descrição:  " + l.getDescricao()
-            + "\n Entrada R$: " + l.getEntrada()
-            + "\n Data Entrada R$: " + l.getDataEntrada()
-            + "\n Saida R$: " + l.getSaida()
-            + "\n Data Saida R$: " + l.getDataSaida()
-            + "\n Será alterado"
-            + " \n Descrição: " + txtDescricao.getText()
-            + "\n Entrada R$: " + txtEntrada.getText()
-            + "\n Data Entrada R$: " + txtDataEntrada.getText()
-            + "\n Saida R$: " + txtSaida.getText()
-            + "\n Data Saida R$: " + txtDataSaida.getText()
-            + "\n Deseja realmente fazer alteração?",
-            "Alteração de dados.", JOptionPane.YES_NO_OPTION)) {
-        case 0:
-        double novaEntrada = Double.parseDouble(txtEntrada.getText());
-        double novaSaida = Double.parseDouble(txtSaida.getText());
-        // Verifica se houve alteração na entrada
-        if (novaEntrada != l.getEntrada()) {
-            l.setEntrada(novaEntrada);
-            dao.entrada(l);
+                "[--ALTERAÇÃO DE DADOS--] \n Dado Atual"
+                + "\n Descrição:  " + l.getDescricao()
+                + "\n Entrada R$: " + l.getEntrada()
+                + "\n Data Entrada R$: " + l.getDataEntrada()
+                + "\n Saida R$: " + l.getSaida()
+                + "\n Data Saida R$: " + l.getDataSaida()
+                + "\n Será alterado"
+                + " \n Descrição: " + txtDescricao.getText()
+                + "\n Entrada R$: " + txtEntrada.getText()
+                + "\n Data Entrada R$: " + txtDataEntrada.getText()
+                + "\n Saida R$: " + txtSaida.getText()
+                + "\n Data Saida R$: " + txtDataSaida.getText()
+                + "\n Deseja realmente fazer alteração?",
+                "Alteração de dados.", JOptionPane.YES_NO_OPTION)) {
+            case 0:
+                double novaEntrada = Double.parseDouble(txtEntrada.getText());
+                double novaSaida = Double.parseDouble(txtSaida.getText());
+
+                // Define os novos valores
+                l.setDescricao(txtDescricao.getText());
+                l.setEntrada(novaEntrada);
+                l.setDataEntrada(txtDataEntrada.getText());
+                l.setSaida(novaSaida);
+                l.setDataSaida(txtDataSaida.getText());
+                dao.alterarLivroCaixa(l);
+
+                carregaTabela();
+                desativarCampo();
+                btAlterar.setEnabled(false);
+                //limpaCampo();
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(null, "Nenhuma alteração foi feita.",
+                        "AVISO", JOptionPane.INFORMATION_MESSAGE);
+                break;
         }
-        // Verifica se houve alteração na saída
-        if (novaSaida != l.getSaida()) {
-            l.setSaida(novaSaida);
-            dao.saida(l);
-        }
-        carregaTabela();
-        //limparTexto();
-        break;
-        case 1:
-        JOptionPane.showMessageDialog(null, "Nenhuma alteração foi feita.",
-            "AVISO", JOptionPane.INFORMATION_MESSAGE);
-        break;
-        }*/
+
     }//GEN-LAST:event_btAlterarActionPerformed
 
     private void btSaidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSaidaActionPerformed
         LivroCaixa l = new LivroCaixa();
         LivroCaixaDao dao = new LivroCaixaDao();
 
-        String saidaText = txtSaida.getText().trim();
+        String saidaText = txtSaida.getText().trim().replace(",", ".");
+        try {
+            double saida = Double.parseDouble(saidaText);
+            l.setSaida(saida);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Formato de número incorreto. Por favor, insira um número válido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         if (saidaText.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Por favor, insira os dados de saída.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Por favor, insira os dados.", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
         l.setDescricao(txtDescricao.getText());
-        l.setSaida(Double.parseDouble(txtSaida.getText()));
+
         l.setEntrada(0.0);
 
-        try {
-            java.util.Date dataFormatada = sdfE.parse(txtDataSaida.getText());
-            java.sql.Date dataSQL = new java.sql.Date(dataFormatada.getTime());
-            l.setDataSaida(dataSQL);
-        } catch (ParseException ex) {
-            JOptionPane.showMessageDialog(null, "Formato de data incorreto. Por favor, insira a data no formato correto (dd-MM-yyyy).", "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        l.setDataSaida(txtDataSaida.getText());
+
         dao.saida(l);
         // limparTexto();
         carregaTabela();
+        btEntrada.setEnabled(false);
+
+        btExcluir.setEnabled(false);
+        desativarCampo();
     }//GEN-LAST:event_btSaidaActionPerformed
 
     private void btEntradaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btEntradaActionPerformed
@@ -338,39 +359,125 @@ public class InternalLivroCaixa extends javax.swing.JInternalFrame {
         LivroCaixa l = new LivroCaixa();
         LivroCaixaDao dao = new LivroCaixaDao();
 
-        String entradaText = txtEntrada.getText().trim();
-
+        String entradaText = txtEntrada.getText().trim().replace(",", ".");
+        try {
+            double entrada = Double.parseDouble(entradaText);
+            l.setEntrada(entrada);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Formato de número incorreto. Por favor, insira um número válido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         if (entradaText.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Por favor, insira os dados de saída.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Por favor, insira os dados.", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
         l.setDescricao(txtDescricao.getText());
-        l.setEntrada(Double.parseDouble(txtEntrada.getText()));
+
         l.setSaida(0.0);
 
-        try {
-            java.util.Date dataFormatada = sdfC.parse(txtDataEntrada.getText());
-            java.sql.Date dataSQL = new java.sql.Date(dataFormatada.getTime());
-            l.setDataEntrada(dataSQL);
-        } catch (ParseException ex) {
-            JOptionPane.showMessageDialog(null, "Formato de data incorreto. Por favor, insira a data no formato correto (dd-MM-yyyy).", "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        l.setDataEntrada(txtDataEntrada.getText());
+
         dao.entrada(l);
         // limparTexto();
         carregaTabela();
+        btSaida.setEnabled(false);
+
+        btExcluir.setEnabled(false);
+        desativarCampo();
     }//GEN-LAST:event_btEntradaActionPerformed
+
+    private void btNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btNovoActionPerformed
+        ativarBotao();
+        ativarCampo();
+        limpaCampo();
+    }//GEN-LAST:event_btNovoActionPerformed
+
+    private void tbLivroCaixaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbLivroCaixaMouseClicked
+
+        LivroCaixa l = new LivroCaixa();
+        LivroCaixaDao dao = new LivroCaixaDao();
+
+        int index = tbLivroCaixa.getSelectedRow();
+        l = dao.ListaLivroCaixa().get(index);
+
+        txtDescricao.setText(l.getDescricao());
+        txtEntrada.setText(Double.toString(l.getEntrada()));
+        txtSaida.setText(Double.toString(l.getSaida()));
+
+        txtDataEntrada.setText(l.getDataEntrada());
+        txtDataSaida.setText(l.getDataSaida());
+
+        btAlterar.setEnabled(true);
+        btSaida.setEnabled(false);
+        btEntrada.setEnabled(false);
+        ativarCampo();
+
+    }//GEN-LAST:event_tbLivroCaixaMouseClicked
+    private void limpaCampo() {
+        txtDescricao.setText(" ");
+        txtEntrada.setText(" ");
+        txtDataEntrada.setText(null);
+        txtSaida.setText(" ");
+        txtDataSaida.setText(null);
+    }
+
+    ;
+
+    private void ativarBotao() {
+        btEntrada.setEnabled(true);
+        btSaida.setEnabled(true);
+        btExcluir.setEnabled(true);
+    }
+
+    ;
+     private void desativarBotao() {
+        btEntrada.setEnabled(false);
+        btSaida.setEnabled(false);
+        btAlterar.setEnabled(false);
+        btExcluir.setEnabled(false);
+    }
+
+    ;
+private void ativarCampo() {
+        txtDescricao.setEnabled(true);
+        txtEntrada.setEnabled(true);
+        txtDataEntrada.setEnabled(true);
+        txtSaida.setEnabled(true);
+        txtDataSaida.setEnabled(true);
+    }
+
+    ;
+
+private void desativarCampo() {
+        txtDescricao.setEnabled(false);
+        txtEntrada.setEnabled(false);
+        txtDataEntrada.setEnabled(false);
+        txtSaida.setEnabled(false);
+        txtDataSaida.setEnabled(false);
+    }
+
+    ;
+
     public class DateRenderer extends DefaultTableCellRenderer {
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
         @Override
         public void setValue(Object value) {
             if (value instanceof Date) {
                 value = dateFormat.format((Date) value);
+            } else if (value instanceof Timestamp) {
+                Timestamp timestampValue = (Timestamp) value;
+                Date dateValue = new Date(timestampValue.getTime());
+                String formattedDateTime = dateTimeFormat.format(dateValue);
+
+                // Define o valor formatado na célula da tabela
+                value = formattedDateTime;
             }
             super.setValue(value);
         }
+
     }
 
     private void carregaTabela() {
@@ -379,6 +486,7 @@ public class InternalLivroCaixa extends javax.swing.JInternalFrame {
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         DateRenderer dateRenderer = new DateRenderer();
 
+        tbLivroCaixa.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         tbLivroCaixa.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
         tbLivroCaixa.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
 
@@ -392,7 +500,7 @@ public class InternalLivroCaixa extends javax.swing.JInternalFrame {
 
             double saldoAtual = 0;
             double saldoAnterior = 0;
-            pstm = con.prepareStatement("SELECT datahora, descricao, entrada, dataentrada, saida, datasaida FROM livrocaixa ORDER BY datahora ASC;");
+            pstm = con.prepareStatement("SELECT datahora, descricao, entrada, dataentrada, saida, datasaida FROM livrocaixa ;");
             rs = pstm.executeQuery();
 
             NumberFormat currencyEntrada = NumberFormat.getCurrencyInstance();
@@ -416,26 +524,27 @@ public class InternalLivroCaixa extends javax.swing.JInternalFrame {
                 double saida = rs.getDouble("saida");
 
                 // Verifica se as datas não são nulas antes de formatá-las
-                String dataEntradaFormatted = (rs.getDate("dataentrada") != null) ? dateRenderer.dateFormat.format(rs.getDate("dataentrada")) : "";
-                String dataSaidaFormatted = (rs.getDate("datasaida") != null) ? dateRenderer.dateFormat.format(rs.getDate("datasaida")) : "";
-
+                //String dataEntradaFormatted = (rs.getDate("dataentrada") != null) ? dateRenderer.dateFormat.format(rs.getDate("dataentrada")) : "";
+                //   String dataSaidaFormatted = (rs.getDate("datasaida") != null) ? dateRenderer.dateFormat.format(rs.getDate("datasaida")) : "";
                 // Adiciona a linha à tabela
                 modelo.addRow(new Object[]{
-                    dateRenderer.dateFormat.format(dataHora),
+                    dateRenderer.dateTimeFormat.format(dataHora),
                     rs.getString("descricao"),
                     currencyEntrada.format(entrada),
-                    dataEntradaFormatted,
+                    rs.getString("dataentrada"),
+                    // dataEntradaFormatted,
                     currencySaida.format(saida),
-                    dataSaidaFormatted,
+                    //dataSaidaFormatted,
+                    rs.getString("datasaida"),
                     currencySaida.format(saldoAtual)
                 });
 
                 // Atualiza os saldos dentro do loop
                 saldoAnterior = saldoAtual;
                 saldoAtual += (entrada - saida);
-                
+
             }
- 
+
             lblSaldoAtual.setText(currencySaida.format(saldoAtual));
             lblSaldoAnterior.setText(currencyEntrada.format(saldoAnterior)); // Removido do loop, pois só precisa ser atualizado uma vez
             conexaoBancoDados.closeConnection(con, pstm, rs);
