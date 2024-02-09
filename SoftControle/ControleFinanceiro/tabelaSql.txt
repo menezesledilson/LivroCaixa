@@ -1,0 +1,17 @@
+Tabela 
+
+CREATE TABLE acesso (
+    Id SERIAL PRIMARY KEY,
+    usuario VARCHAR (10),
+    login VARCHAR (10),
+    senha VARCHAR (4)
+);
+
+CREATE TABLE LIVROCAIXA (
+    Id SERIAL PRIMARY KEY,
+    datahora TIMESTAMP DEFAULT date_trunc('minute', CURRENT_TIMESTAMP),
+    descricao VARCHAR(80),
+    entrada DOUBLE PRECISION,
+    saida DOUBLE PRECISION,
+	observacao VARCHAR(200)
+);
