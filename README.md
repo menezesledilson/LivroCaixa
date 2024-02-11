@@ -8,6 +8,7 @@
 - [x] Livro caixa
 - [x] Livro caixa anual 
 - [x] Pesquisa de livro caixa mensal
+- [x]Backup
 
 ###  🛠 Tecnologias
 - Java JDK 8
