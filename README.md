@@ -11,6 +11,7 @@
 - [x] Backup
 
 ###  🛠 Tecnologias
+- linguagem Java
 - Java JDK 8
 - Apache Netbeans 12
 - Jasper iReport 5.6
