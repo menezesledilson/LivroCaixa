@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ee56a461-757b-4449-a18a-257006ec22fe">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select * from venda]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer"/>
+	<field name="datahora" class="java.sql.Timestamp"/>
+	<field name="cliente" class="java.lang.String"/>
+	<field name="celular" class="java.lang.String"/>
+	<field name="datavenda" class="java.lang.String"/>
+	<field name="nomecarro" class="java.lang.String"/>
+	<field name="anocarro" class="java.lang.Integer"/>
+	<field name="placacarro" class="java.lang.String"/>
+	<field name="chassicarro" class="java.lang.String"/>
+	<field name="pagamento" class="java.lang.String"/>
+	<field name="comissao" class="java.math.BigDecimal"/>
+	<field name="observacao" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="148" y="15" width="252" height="20" uuid="f3e6665b-9292-45d7-8d32-95b1e9a8fd87"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RELATÓRIO DE VENDAS]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="23" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="432" y="2" width="100" height="20" uuid="9a28b443-4302-42ec-a1e0-8df8db24f68f"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="-10" y="22" width="576" height="1" uuid="3032e954-5f3b-4c40-bbf9-26a15fe3ffab"/>
+			</line>
+			<textField>
+				<reportElement x="542" y="2" width="100" height="20" uuid="120acf81-79cb-4848-a326-85f291c1952d"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="500" y="2" width="100" height="20" uuid="27f574ca-c737-453a-9fc3-370405a7488d"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Pagina.:]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<staticText>
+				<reportElement x="-16" y="2" width="100" height="20" uuid="913b7d62-e74d-4892-be76-473d7f665b4e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[DATA VENDA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="80" y="2" width="100" height="20" uuid="51138abd-191b-4fff-9f77-562fccebedf9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[CLIENTE]]></text>
+			</staticText>
+			<line>
+				<reportElement x="-10" y="22" width="576" height="1" uuid="7b442f2c-0e4e-4de8-bfb4-eb4486a89ab5"/>
+			</line>
+			<staticText>
+				<reportElement x="186" y="2" width="100" height="20" uuid="782f3c7c-3aa8-4a0e-acd7-dd68c90a7ef3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[celular]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement x="-23" y="2" width="100" height="20" uuid="d88ca9b3-ab41-4065-afeb-d3c79639678a"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{datavenda}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="109" y="2" width="100" height="20" uuid="6e17685e-80e8-41e2-a48d-7f963c9af212"/>
+				<textFieldExpression><![CDATA[$F{cliente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="215" y="2" width="100" height="20" uuid="e35d268e-6df5-4867-99bf-14c048562cf9"/>
+				<textFieldExpression><![CDATA[$F{celular}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="56" splitType="Stretch">
+			<line>
+				<reportElement x="-10" y="4" width="576" height="1" uuid="1635a7c6-c4fd-4061-b893-39e0cbd3b7c2"/>
+			</line>
+			<line>
+				<reportElement x="-10" y="55" width="576" height="1" uuid="86af8f45-9233-44a6-a751-b02d422f4e0f"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="-10" y="50" width="576" height="1" uuid="86af8f45-9233-44a6-a751-b02d422f4e0f"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

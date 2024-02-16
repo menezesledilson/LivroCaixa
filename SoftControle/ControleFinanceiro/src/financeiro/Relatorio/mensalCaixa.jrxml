@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ee56a461-757b-4449-a18a-257006ec22fe">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select * from livrocaixa]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer"/>
+	<field name="datahora" class="java.sql.Timestamp"/>
+	<field name="descricao" class="java.lang.String"/>
+	<field name="entrada" class="java.lang.Double"/>
+	<field name="saida" class="java.lang.Double"/>
+	<variable name="somaEntrada" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{entrada}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="somaSaida" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{saida}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="f3e6665b-9292-45d7-8d32-95b1e9a8fd87" x="148" y="15" width="252" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RELATÓRIO DO MOVIMENTO DO CAIXA]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="23" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="9a28b443-4302-42ec-a1e0-8df8db24f68f" x="432" y="2" width="100" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="3032e954-5f3b-4c40-bbf9-26a15fe3ffab" x="-10" y="22" width="576" height="1"/>
+			</line>
+			<textField>
+				<reportElement uuid="120acf81-79cb-4848-a326-85f291c1952d" x="542" y="2" width="100" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="27f574ca-c737-453a-9fc3-370405a7488d" x="500" y="2" width="100" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Pagina.:]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="913b7d62-e74d-4892-be76-473d7f665b4e" x="-3" y="2" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[DATA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="51138abd-191b-4fff-9f77-562fccebedf9" x="148" y="2" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[DESCRIÇÃO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4ce68619-e7fb-4691-9f35-e69523bad3d0" x="311" y="2" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[ENTRADA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5636367e-a4ba-44da-9783-4cbf15f53301" x="439" y="2" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[SAIDA]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="7b442f2c-0e4e-4de8-bfb4-eb4486a89ab5" x="-10" y="22" width="576" height="1"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement uuid="780c1743-4f71-4866-81fa-5c94eacdd518" x="0" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{datahora}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="339495e0-c2e4-4f85-880c-485370204f74" x="148" y="0" width="163" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{descricao}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="dbc74d8e-2003-451b-aa73-0a981d523d42" x="316" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{entrada}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="80745e44-e7f0-40dc-b159-e1aad86b5c5f" x="442" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{saida}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="d9250482-7eb1-474d-a6cd-2121d7a5bd15" x="457" y="0" width="44" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[R$:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d9250482-7eb1-474d-a6cd-2121d7a5bd15" x="330" y="0" width="70" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[R$:]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<summary>
+		<band height="56" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="dd0877ef-1449-416b-b799-d6a6873a13b4" x="211" y="10" width="100" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[TOTAL ENTRADA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dd0877ef-1449-416b-b799-d6a6873a13b4" x="212" y="32" width="100" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[TOTAL SAIDA]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="b0d0f550-b130-4967-b39c-48b2f868e1e5" x="319" y="9" width="100" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{somaEntrada}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ec713200-50bd-4353-a8a6-d76ce63284ba" x="316" y="31" width="100" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{somaSaida}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="1635a7c6-c4fd-4061-b893-39e0cbd3b7c2" x="-10" y="4" width="576" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="86af8f45-9233-44a6-a751-b02d422f4e0f" x="-10" y="55" width="576" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="86af8f45-9233-44a6-a751-b02d422f4e0f" x="-10" y="50" width="576" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+		</band>
+	</summary>
+</jasperReport>
