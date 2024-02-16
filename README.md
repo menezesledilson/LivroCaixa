@@ -8,9 +8,10 @@
 - [x] Livro caixa
 - [x] Livro caixa anual 
 - [x] Pesquisa de livro caixa mensal
-- [x]Backup
+- [x] Backup
 
 ###  🛠 Tecnologias
+- linguagem Java
 - Java JDK 8
 - Apache Netbeans 12
 - Jasper iReport 5.6

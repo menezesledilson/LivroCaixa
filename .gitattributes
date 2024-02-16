@@ -1,0 +1,5 @@
+# Fix syntax highlighting for devcontainer files
+*.html linguist-language=Java
+
+
+
